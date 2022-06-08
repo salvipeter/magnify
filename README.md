@@ -12,4 +12,4 @@ Keys:
 
 If `r` is the radius and `d` the distance of a point from the center of the map,
 the new distance is computed as `r * d / (r - d)`, multiplied by a constant.
-This gives `0` for the center point (when `d = 0`, and infinity when `d = r`.
+This gives `0` for the center point (when `d = 0`), and infinity when `d = r`.
