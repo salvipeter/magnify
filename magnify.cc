@@ -1,11 +1,15 @@
+#include <array>
 #include <cstdlib>
 #include <iostream>
+#include <vector>
 
 #include <GL/glut.h>
 #include <Magick++/Image.h>
 
-Magick::Image image;
+using Color = std::array<double, 3>;
+std::vector<Color> pixels;
 int width, height, center_x, center_y, radius;
+
 double alpha = 0.1;
 
 void display() {
@@ -27,8 +31,7 @@ void display() {
           image_y = py;
         }
       }
-      Magick::ColorRGB color = image.pixelColor(image_x, image_y);
-      glColor3d(color.red(), color.green(), color.blue());
+      glColor3dv(&pixels[image_x * height + image_y][0]);
       glVertex2i(x, y);
     }
   glEnd();
@@ -57,12 +60,19 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  Magick::Image image;
   image.read(argv[1]);
   width = image.columns();
   height = image.rows();
   center_x = width / 2;
   center_y = height / 2;
   radius = std::min(width, height) / 3;
+  pixels.reserve(width * height);
+  for (int x = 0; x < width; ++x)
+    for (int y = 0; y < height; ++y) {
+      Magick::ColorRGB color = image.pixelColor(x, y);
+      pixels.push_back({ color.red(), color.green(), color.blue() });
+    }
 
   glutInit(&argc, argv);
   glutInitWindowSize(width, height);
