@@ -10,7 +10,7 @@ using Color = std::array<double, 3>;
 std::vector<Color> pixels;
 int width, height, center_x, center_y, radius;
 
-double alpha = 0.1;
+double alpha = 0.5;
 
 void display() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -23,7 +23,7 @@ void display() {
       double r = std::sqrt(dx * dx + dy * dy);
       if (r < radius) {
         dx /= r; dy /= r;
-        double scale = alpha * (radius * radius - radius + r) / (radius - r);
+        double scale = alpha * radius * r / (radius - r);
         int px = std::round(center_x + dx * scale);
         int py = std::round(center_y + dy * scale);
         if (px >= 0 && px < width && py >= 0 && py < height) {
