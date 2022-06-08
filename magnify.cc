@@ -22,8 +22,7 @@ void display() {
       double dx = x - center_x, dy = y - center_y;
       double r = std::sqrt(dx * dx + dy * dy);
       if (r < radius) {
-        dx /= r; dy /= r;
-        double scale = alpha * radius * r / (radius - r);
+        double scale = alpha * radius / (radius - r);
         int px = std::round(center_x + dx * scale);
         int py = std::round(center_y + dy * scale);
         if (px >= 0 && px < width && py >= 0 && py < height) {
