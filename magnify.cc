@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 
 #include <GL/glut.h>
@@ -5,20 +6,20 @@
 
 Magick::Image image;
 int width, height, center_x, center_y, radius;
-double alpha = 0.5;
+double alpha = 0.1;
 
 void display() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT);
-  int range = std::pow(2, image.modulusDepth());
+  glBegin(GL_POINTS);
   for (int x = 0; x < width; ++x)
     for (int y = 0; y < height; ++y) {
       int image_x = x, image_y = y;
       double dx = x - center_x, dy = y - center_y;
       double r = std::sqrt(dx * dx + dy * dy);
-      if (r <= radius) {
+      if (r < radius) {
         dx /= r; dy /= r;
-        double scale = alpha * r * radius / (alpha * r + radius);
+        double scale = alpha * (radius * radius - radius + r) / (radius - r);
         int px = std::round(center_x + dx * scale);
         int py = std::round(center_y + dy * scale);
         if (px >= 0 && px < width && py >= 0 && py < height) {
@@ -26,23 +27,27 @@ void display() {
           image_y = py;
         }
       }
-      auto color = image.pixelColor(image_x, image_y);
-      double red = color.quantumRed() / range;
-      double green = color.quantumGreen() / range;
-      double blue = color.quantumBlue() / range;
-      glColor3d(red, green, blue);
+      Magick::ColorRGB color = image.pixelColor(image_x, image_y);
+      glColor3d(color.red(), color.green(), color.blue());
       glVertex2i(x, y);
     }
+  glEnd();
   glutSwapBuffers();
 }
 
-void mouseMotion(int x, int y) {
-  center_x = x;
-  center_y = y;
-  glutPostRedisplay();
+void keyboard(unsigned char key, int, int) {
+  switch (key) {
+  case 'd' : alpha /= 1.1; glutPostRedisplay(); break;
+  case 'f' : alpha *= 1.1; glutPostRedisplay(); break;
+  case 'j' : if (radius > 10) { radius /= 1.1; glutPostRedisplay(); } break;
+  case 'k' : radius *= 1.1; glutPostRedisplay(); break;
+  case 'q' : std::exit(0);
+  }
 }
 
-void mouseWheel(int button, int dir, int x, int y) {
+void mouse(int x, int y) {
+  center_x = x;
+  center_y = y;
   glutPostRedisplay();
 }
 
@@ -64,8 +69,8 @@ int main(int argc, char *argv[]) {
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
   glutCreateWindow("Magnifying Glass");
   glutDisplayFunc(display);
-  glutMotionFunc(mouseMotion);
-  // glutMouseWheelFunc(mouseWheel);
+  glutKeyboardFunc(keyboard);
+  glutPassiveMotionFunc(mouse);
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
