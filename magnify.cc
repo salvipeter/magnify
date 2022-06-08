@@ -4,7 +4,7 @@
 #include <vector>
 
 #include <GL/glut.h>
-#include <Magick++/Image.h>
+#include <Magick++.h>
 
 using Color = std::array<double, 3>;
 std::vector<Color> pixels;
@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  Magick::InitializeMagick(nullptr);
   Magick::Image image;
   image.read(argv[1]);
   width = image.columns();
